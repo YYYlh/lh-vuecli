@@ -3,6 +3,7 @@
 const { program } = require('commander')
 const download = require('./src/gitclone/download')
 const fetchSwagger = require('./src/swagger')
+const generateVue = require('./src/generate_vue')
 const process = require('process')
 
 program
@@ -32,6 +33,13 @@ program
       needTags = null
     }
     fetchSwagger(serverUrl, needTags)
+  })
+
+program
+  .command('g [type] <name>')
+  .description('创建vue文件')
+  .action(function(type, name){
+    generateVue(type, name)
   })
 
 program.parse(process.argv)

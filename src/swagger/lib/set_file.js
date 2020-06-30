@@ -8,7 +8,7 @@ const hump = require('./hump')
 const read = require('../../file/read')
 const write = require('../../file/write')
 const pwdDir = process.cwd()
-const configDir = path.join(pwdDir, 'config')
+const configDir = path.join(pwdDir, 'src/config')
 
 module.exports = {
   // baseUrl文件
