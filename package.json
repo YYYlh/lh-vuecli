@@ -21,6 +21,7 @@
   "homepage": "https://github.com/YYYlh/lh-vuecli#readme",
   "dependencies": {
     "commander": "^5.1.0",
-    "download-git-repo": "^3.0.2"
+    "download-git-repo": "^3.0.2",
+    "escodegen": "^1.14.3"
   }
 }
