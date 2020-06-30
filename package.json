@@ -22,6 +22,9 @@
   "dependencies": {
     "commander": "^5.1.0",
     "download-git-repo": "^3.0.2",
-    "escodegen": "^1.14.3"
+    "escodegen": "^1.14.3",
+    "esprima": "^4.0.1",
+    "estraverse": "^5.1.0",
+    "superagent": "^5.3.1"
   }
 }

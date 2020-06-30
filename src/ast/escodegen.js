@@ -1,6 +1,3 @@
-const escodegen = require('escodegen');
+const escodegen = require('escodegen')
 
 module.exports = escodegen.generate
-
- 
- 

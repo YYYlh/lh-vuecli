@@ -7,20 +7,30 @@ module.exports = {
     };
   },
   importTemplate(names, source) {
-    if (Object.prototype.toString.call(names) !== "[object Array]") {
-      return;
+    let specifiers = [];
+    if (Object.prototype.toString.call(names) === "[object Array]") {
+      specifiers = names.map((name) => ({
+        type: "ImportSpecifier",
+        local: {
+          type: "Identifier",
+          name: name,
+        },
+        imported: {
+          type: "Identifier",
+          name: name,
+        },
+      }));
+    } else if (typeof names === "string") {
+      specifiers = [
+        {
+          type: "ImportDefaultSpecifier",
+          local: {
+            type: "Identifier",
+            name: names,
+          },
+        },
+      ];
     }
-    let specifiers = names.map((name) => ({
-      type: "ImportSpecifier",
-      local: {
-        type: "Identifier",
-        name: name,
-      },
-      imported: {
-        type: "Identifier",
-        name: name,
-      },
-    }));
     return {
       type: "ImportDeclaration",
       specifiers: specifiers,
@@ -101,6 +111,30 @@ module.exports = {
       },
       specifiers: [],
       source: null,
+    };
+  },
+  // 导出变量模板
+  exportsVarTemplate(name, value) {
+    return {
+      type: "ExportNamedDeclaration",
+      declaration: {
+        type: "VariableDeclaration",
+        declarations: [
+          {
+            type: "VariableDeclarator",
+            id: {
+              type: "Identifier",
+              name,
+            },
+            init: {
+              type: "Literal",
+              value,
+              raw: value,
+            },
+          },
+        ],
+        kind: "const",
+      },
     };
   },
 };
