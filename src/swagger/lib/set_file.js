@@ -3,12 +3,27 @@ const process = require('process')
 const astEscodegen = require('../../ast/escodegen')
 const astParseModule = require('../../ast/esprima')
 const astTraverse = require('../../ast/estraverse')
-const { programBodyTemplate, exportsVarTemplate } = require('../../ast/template') 
+const { programBodyTemplate, exportsVarTemplate, exportObjectTemplate, keyValueTemplate, keyValuerequireTemplate } = require('../../ast/template') 
 const hump = require('./hump')
 const read = require('../../file/read')
 const write = require('../../file/write')
-const pwdDir = process.cwd()
-const configDir = path.join(pwdDir, 'src/config')
+const cwdDir = process.cwd()
+const configDir = path.join(cwdDir, 'src/config')
+
+function readDataToVueCofig() {
+  const keyValuerequireAst = keyValuerequireTemplate('proxy', './proxy.config.js')
+  read(path.join(cwdDir, 'vue.config.js')).then(res => {
+    const vueConfigAst = astParseModule(res)
+    astTraverse(vueConfigAst, {
+      leave(node, partNode) {
+        if (node.name === 'devServer') {
+          partNode.value.properties = [keyValuerequireAst]
+        }
+      }
+    })
+    write(astEscodegen(vueConfigAst), cwdDir, 'vue.config.js')
+  })
+}
 
 module.exports = {
   // baseUrl文件
@@ -52,7 +67,52 @@ module.exports = {
   // 各个接口地址文件
   async setRestUrlFile() {},
   // 服务代理配置文件
-  async setProxyConfigFile() {},
+  async setProxyConfigFile({serverUrl, serverName}) {
+    let proxy = {}
+    let body = []
+    let mark = false
+    // 获取文件已有内容并转为ast
+    try {
+      const fileData = await read(path.join(cwdDir, 'proxy.config.js'))
+      const AST = astParseModule(fileData)
+      mark = fileData === '' ? false : true
+      body = AST.body
+    } catch (error) {
+      
+    }
+    const keyName = `/${serverName}`
+    proxy[keyName] = {
+      target: `http://${serverUrl}/${serverName}`,
+      changeOrgin: true,
+    }
+    let kvAst = keyValueTemplate(proxy)
+    const program = programBodyTemplate(body)
+    let isExists = false
+    astTraverse(program, {
+      enter() {},
+      leave(node) {
+        if (node.type === 'AssignmentExpression') {
+          isExists = true
+          let index = node.right.properties.findIndex(item => item.key.value === keyName)
+          if (index !== -1) {
+            node.right.properties[index] = kvAst
+          } else {
+            node.right.properties.push(kvAst)
+          }
+        }
+        if (node.sourceType === 'module') {
+          if (!isExists) {
+            node.body = [...body, exportObjectTemplate(kvAst)]
+          }
+        }
+      }
+    })
+    write(astEscodegen(program), cwdDir, 'proxy.config.js').then(res => {
+      if (res === 'success' && !mark) {
+        readDataToVueCofig()
+      }
+    })
+  },
   // 请求方法文件
   async setServiceFile() {}
 }

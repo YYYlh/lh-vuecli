@@ -1,6 +1,6 @@
 const get = require('./lib/fetch')
 const format = require('./lib/format')
-const { setConfigFile } = require('./lib/set_file')
+const { setConfigFile, setProxyConfigFile } = require('./lib/set_file')
 
 module.exports = async function(url, needTags) {
   const baseUrl = `${url}/swagger-resources`
@@ -9,7 +9,8 @@ module.exports = async function(url, needTags) {
     const location = `${url}/${body[0].location}`
     const res = await get(location)
     const apiData = format(res.body, needTags)
-    setConfigFile(apiData)
+    // setConfigFile(apiData)
+    setProxyConfigFile(apiData)
   } catch (error) {
     throw error
   }
