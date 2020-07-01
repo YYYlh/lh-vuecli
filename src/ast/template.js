@@ -1,3 +1,5 @@
+const astEsprima = require('./esprima')
+
 module.exports = {
   programBodyTemplate(body) {
     return {
@@ -137,4 +139,65 @@ module.exports = {
       },
     };
   },
+  // 导出对象模板
+  exportObjectTemplate(obj) {
+    return {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "AssignmentExpression",
+        "operator": "=",
+        "left": {
+          "type": "MemberExpression",
+          "computed": false,
+          "object": {
+            "type": "Identifier",
+            "name": "module"
+          },
+          "property": {
+            "type": "Identifier",
+            "name": "exports"
+          }
+        },
+        "right": {
+          "type": "ObjectExpression",
+          "properties": [
+            obj
+          ]
+        }
+      }
+    }
+  },
+  // key-value生成模板
+  keyValueTemplate(obj) {
+    const code = `let a = ${JSON.stringify(obj)}`
+    return astEsprima(code).body[0].declarations[0].init.properties[0]
+  },
+  // require模板
+  keyValuerequireTemplate(keyName, path) {
+    return {
+      "type": "Property",
+      "key": {
+        "type": "Identifier",
+        "name": keyName
+      },
+      "computed": false,
+      "value": {
+        "type": "CallExpression",
+        "callee": {
+          "type": "Identifier",
+          "name": "require"
+        },
+        "arguments": [
+          {
+            "type": "Literal",
+            "value": path,
+            "raw": `${path}`
+          }
+        ]
+      },
+      "kind": "init",
+      "method": false,
+      "shorthand": false
+    }
+  }
 };
