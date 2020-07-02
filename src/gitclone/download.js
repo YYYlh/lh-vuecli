@@ -5,10 +5,12 @@ const chalk = require('chalk')
 const  logSymbols = require('log-symbols')
 const fs = require('fs')
 const npmInstall = require('./npm_install')
+const log = require('../console_log/index')
 
 const spainner = ora('初始化模板中......')
 const downLoadUrl = 'http://github.com:YYYlh/lh-vuecli-template'
 const downLoad = require('download-git-repo')
+const { white } = require('chalk')
 module.exports = function(projectName) {
     spainner.start() // 下载开始
     downLoad(downLoadUrl, projectName, { clone: true }, (err) => {
@@ -38,10 +40,10 @@ module.exports = function(projectName) {
             fs.writeFileSync(packagePath, packageResult)
             npmInstall(projectName, (res) => {
                 if (res !== 'success') {
-                    console.log(logSymbols.info, chalk.white('别急昂！！'))
+                    log('info', 'white', '别急昂！！')
                     return
                 }
-                console.log(logSymbols.info, chalk.blueBright(`cd ${projectName} 开始摸鱼吧`))
+                log('info', 'blueBright', `cd ${projectName} 开始摸鱼吧`)
             })
         })
     })
