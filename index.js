@@ -15,9 +15,7 @@ program
   .description('初始化项目')
   .action(function(projectName){
     // 从git上拉取代码模板
-    download(projectName, (err) => {
-      console.log(err);
-    })
+    download(projectName)
   })
 
 program

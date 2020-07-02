@@ -1,10 +1,10 @@
 {
-  "name": "lh-vuecli",
-  "version": "1.0.0",
+  "name": "fantasy-vue-cli",
+  "version": "0.1.0",
   "description": "👴的脚手架工具",
   "main": "index.js",
   "bin": {
-    "lh-vuecli": "index.js"
+    "lh": "index.js"
   },
   "repository": {
     "type": "git",
@@ -13,18 +13,23 @@
   "keywords": [
     "cli"
   ],
-  "author": "liuhao",
+  "author": "yyylh",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/YYYlh/lh-vuecli/issues"
   },
   "homepage": "https://github.com/YYYlh/lh-vuecli#readme",
   "dependencies": {
+    "chalk": "^4.1.0",
     "commander": "^5.1.0",
     "download-git-repo": "^3.0.2",
     "escodegen": "^1.14.3",
     "esprima": "^4.0.1",
     "estraverse": "^5.1.0",
+    "handlebars": "^4.7.6",
+    "inquirer": "^7.2.0",
+    "log-symbols": "^4.0.0",
+    "ora": "^4.0.4",
     "superagent": "^5.3.1"
   }
 }
