@@ -1,5 +1,6 @@
-module.exports = function(name) {
-return `
+module.exports =  {
+    vueFile(name) {
+        return `
 <template>
     <div>
         这是${name}页面
@@ -19,5 +20,14 @@ export default {
 <style scoped lang="scss">
 
 </style>
-`
+        `
+    },
+    routeConfig(name) {
+        return `
+{
+    path: '/${name}',
+    component: () => import('@views/${name}')
+}
+        `
+    }
 }
