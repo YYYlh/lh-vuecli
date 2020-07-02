@@ -1,16 +1,14 @@
 const handlebars = require('handlebars')
 const inquirer = require('inquirer')
 const ora = require('ora')
-const chalk = require('chalk')
-const  logSymbols = require('log-symbols')
 const fs = require('fs')
+const downLoad = require('download-git-repo')
 const npmInstall = require('./npm_install')
 const log = require('../console_log/index')
 
 const spainner = ora('初始化模板中......')
 const downLoadUrl = 'http://github.com:YYYlh/lh-vuecli-template'
-const downLoad = require('download-git-repo')
-const { white } = require('chalk')
+
 module.exports = function(projectName) {
     spainner.start() // 下载开始
     downLoad(downLoadUrl, projectName, { clone: true }, (err) => {
