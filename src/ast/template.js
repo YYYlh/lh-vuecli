@@ -167,10 +167,37 @@ module.exports = {
       }
     }
   },
+  // esmodule导出
+  es6ExportTemplate(properties) {
+    return {
+      "type": "ExportDefaultDeclaration",
+      "declaration": {
+        "type": "ObjectExpression",
+        "properties": properties
+      }
+    }
+  },
   // key-value生成模板
   keyValueTemplate(obj) {
     const code = `let a = ${JSON.stringify(obj)}`
-    return astEsprima(code).body[0].declarations[0].init.properties[0]
+    let program = astEsprima(code)
+    astTraverse(program, {
+      leave(node) {
+        if (node.type === 'Property') {
+          // 判断有没有'/' ','
+          if (node.key) {
+            const value = node.key.value
+            const reg = new RegExp("[`~!@#$^&*%()=|{}':;',\\[\\]<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？ ]");
+            if (reg.test(value)) {
+            } else {
+              node.key.type = 'Identifier'
+              node.key.name = value
+            }
+          }
+        }
+      }
+    })
+    return program.body[0].declarations[0].init.properties
   },
   // require模板
   keyValuerequireTemplate(keyName, path) {
@@ -198,6 +225,36 @@ module.exports = {
       "kind": "init",
       "method": false,
       "shorthand": false
+    }
+  },
+  // 模板字符串模板
+  templateStrTemplate(vari, str) {
+    return {
+      "type": "TemplateLiteral",
+      "quasis": [
+        {
+          "type": "TemplateElement",
+          "value": {
+            "raw": "",
+            "cooked": ""
+          },
+          "tail": false
+        },
+        {
+          "type": "TemplateElement",
+          "value": {
+            "raw": str,
+            "cooked": str
+          },
+          "tail": true
+        }
+      ],
+      "expressions": [
+        {
+          "type": "Identifier",
+          "name": vari
+        }
+      ]
     }
   }
 };

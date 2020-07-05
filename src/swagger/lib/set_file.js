@@ -3,7 +3,16 @@ const process = require('process')
 const astEscodegen = require('../../ast/escodegen')
 const astParseModule = require('../../ast/esprima')
 const astTraverse = require('../../ast/estraverse')
-const { programBodyTemplate, exportsVarTemplate, exportObjectTemplate, keyValueTemplate, keyValuerequireTemplate } = require('../../ast/template') 
+const { 
+  programBodyTemplate,
+  exportsVarTemplate,
+  exportObjectTemplate,
+  keyValueTemplate,
+  keyValuerequireTemplate,
+  importTemplate,
+  es6ExportTemplate,
+  templateStrTemplate
+} = require('../../ast/template') 
 const hump = require('./hump')
 const read = require('../../file/read')
 const write = require('../../file/write')
@@ -65,7 +74,35 @@ module.exports = {
     write(astEscodegen(program), configDir, 'config.js')
   },
   // 各个接口地址文件
-  async setRestUrlFile() {},
+  async setRestUrlFile({serverName, paths}) {
+    const name = hump(serverName)
+    let body = []
+    // 引入config.js
+    const importAst = importTemplate([name], './config.js')
+    body[0] = importAst
+    const pathsObjAst = keyValueTemplate(formatPaths(paths))
+  
+    const exportDefaultAst = es6ExportTemplate(pathsObjAst)
+    const program = programBodyTemplate(body)
+    astTraverse(program, {
+      leave(node) {
+        if (node.sourceType === 'module') {
+          node.body = [...body, exportDefaultAst]
+        }
+      }
+    })
+    astTraverse(program, {
+      leave(node) {
+        if (node.type === 'Property') { 
+          if (node.value.type !== 'ObjectExpression') {
+            const oldValue = node.value.value
+            node.value = templateStrTemplate(name, oldValue)
+          }
+        }
+      }
+    })
+    write(astEscodegen(program), configDir, `${name}.js`)
+  },
   // 服务代理配置文件
   async setProxyConfigFile({serverUrl, serverName}) {
     let proxy = {}
@@ -95,9 +132,9 @@ module.exports = {
           isExists = true
           let index = node.right.properties.findIndex(item => item.key.value === keyName)
           if (index !== -1) {
-            node.right.properties[index] = kvAst
+            node.right.properties[index] = kvAst[index]
           } else {
-            node.right.properties.push(kvAst)
+            node.right.properties.push(...kvAst)
           }
         }
         if (node.sourceType === 'module') {
@@ -115,4 +152,22 @@ module.exports = {
   },
   // 请求方法文件
   async setServiceFile() {}
+}
+
+
+
+// 格式化paths
+function formatPaths(paths, name) {
+  let result = {}
+  for (const key in paths) {
+    let path = paths[key]
+    let obj = {}
+    for (const tag of path.tagName) {
+      const pathArr = tag.path.split('/')
+      pathKey = pathArr[pathArr.length - 1]
+      obj[pathKey] = tag.path
+    }
+    result[hump(key)] = obj
+  }
+  return result
 }

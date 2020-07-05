@@ -6,7 +6,8 @@ const cwdPath = process.cwd()
 
 module.exports = function (projectName, callback) {
     const ls = spawn('npm', ['i'], {
-        cwd: path.join(cwdPath, projectName)
+        cwd: path.join(cwdPath, projectName),
+        shell: true
     })
 
     ls.stdout.on('data', (data) => {
@@ -14,7 +15,7 @@ module.exports = function (projectName, callback) {
     });
 
     ls.stderr.on('data', (data) => {
-        console.log('err',data.toString());
+        console.log(data.toString());
         callback(data)
     })
 
