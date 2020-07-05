@@ -1,4 +1,5 @@
 const astEsprima = require('./esprima')
+const astTraverse = require('./estraverse')
 
 module.exports = {
   programBodyTemplate(body) {

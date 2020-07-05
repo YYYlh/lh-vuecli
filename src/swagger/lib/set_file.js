@@ -139,7 +139,7 @@ module.exports = {
         }
         if (node.sourceType === 'module') {
           if (!isExists) {
-            node.body = [...body, exportObjectTemplate(kvAst)]
+            node.body = [...body, exportObjectTemplate(...kvAst)]
           }
         }
       }

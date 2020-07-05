@@ -10,7 +10,7 @@ module.exports = async function(url, needTags) {
     const res = await get(location)
     const apiData = format(res.body, needTags)
     setConfigFile(apiData)
-    // setProxyConfigFile(apiData)
+    setProxyConfigFile(apiData)
     setRestUrlFile(apiData)
   } catch (error) {
     throw error
