@@ -24,7 +24,7 @@ module.exports = function(type, name) {
         write(tempalteStr, check.pathUrl, 'index.vue').then(res => {
             log('success', 'green', `创建完毕`)
             if (type === 'view' || type === 'v') {
-                console.log(routeConfig(name));
+                console.log(routeConfig(name))
             }   
         })
     }
