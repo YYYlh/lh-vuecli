@@ -7,7 +7,7 @@ const cwdPath = process.cwd()
 module.exports = function (projectName, callback) {
     const ls = spawn('npm', ['i'], {
         cwd: path.join(cwdPath, projectName),
-        shell: true
+        shell: true // 兼容windows系统
     })
 
     ls.stdout.on('data', (data) => {
