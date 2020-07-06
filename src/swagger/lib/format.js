@@ -1,4 +1,5 @@
 const classify = require('./classfiy')
+const { log } = require('../../console_log/index')
 // 别名映射表
 const aliasObj = {}
 
@@ -31,7 +32,7 @@ module.exports = function(apiData, needTags) {
     for (const item of needTagStrs) {
       const result = tags.find((r) => r.name === item)
       if (!result) {
-        console.log('\x1B[31m%s\x1b[39m', `没有该${item}分类`)
+        log('error', 'red', `没有该${item}分类`)
         return false
       } else {
         tempTags.push(result)
