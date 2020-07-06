@@ -26,7 +26,7 @@ export default {
         return `
 {
     path: '/${name}',
-    component: () => import('@views/${name}')
+    component: () => import('@/views/${name}')
 }
         `
     }

@@ -11,13 +11,16 @@ const {
   keyValuerequireTemplate,
   importTemplate,
   es6ExportTemplate,
-  templateStrTemplate
+  templateStrTemplate,
+  exportsFuncTemplate
 } = require('../../ast/template') 
 const hump = require('./hump')
 const read = require('../../file/read')
 const write = require('../../file/write')
+
 const cwdDir = process.cwd()
 const configDir = path.join(cwdDir, 'src/config')
+const apiDir = path.join(cwdDir, 'src/api')
 
 function readDataToVueCofig() {
   const keyValuerequireAst = keyValuerequireTemplate('proxy', './proxy.config.js')
@@ -151,13 +154,37 @@ module.exports = {
     })
   },
   // 请求方法文件
-  async setServiceFile() {}
+  async setServiceFile({serverName, serverUrl, paths}) {
+    const name = hump(serverName)
+    let body = []
+    // 引入对于的restUrl文件
+    const restUrlImportAst = importTemplate('RESTURL', `@/config/${name}`)
+    // 引入封装的请求方法
+    const fetchFunImportAst = importTemplate(['getOrDelete', 'postOrPut'], '@/utils/http')
+    body[0] = fetchFunImportAst
+    body[1] = restUrlImportAst
+    // 请求方法
+    const pathsObj = formatPaths(paths, true)
+    let fetchFunImportAsts = []
+    let fetchFunNames = {get: 'getOrDelete', post: 'postOrPut'}
+    for (const key in pathsObj) {
+      const curObj = pathsObj[key]
+      for (const curKey in curObj) {
+        const cur = curObj[curKey]
+        const { methond } = cur
+        fetchFunImportAsts.push(exportsFuncTemplate(curKey, fetchFunNames[methond], 'params', methond, `${key}`))
+      }
+    }
+    body = [...body, ...fetchFunImportAsts]
+    const program = programBodyTemplate(body)
+    write(astEscodegen(program), apiDir, `${name}.js`)
+  }
 }
 
 
 
 // 格式化paths
-function formatPaths(paths, name) {
+function formatPaths(paths, showMethond) {
   let result = {}
   for (const key in paths) {
     let path = paths[key]
@@ -165,7 +192,14 @@ function formatPaths(paths, name) {
     for (const tag of path.tagName) {
       const pathArr = tag.path.split('/')
       pathKey = pathArr[pathArr.length - 1]
-      obj[pathKey] = tag.path
+      if (showMethond) {
+        obj[pathKey] = {
+          url: tag.path,
+          methond: tag.methond
+        }
+      } else {
+        obj[pathKey] = tag.path
+      }
     }
     result[hump(key)] = obj
   }
