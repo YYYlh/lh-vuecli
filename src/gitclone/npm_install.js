@@ -11,11 +11,11 @@ module.exports = function (projectName, callback) {
     })
 
     ls.stdout.on('data', (data) => {
-        console.log(data.toString());
+        console.log(data.toString())
     });
 
     ls.stderr.on('data', (data) => {
-        console.log(data.toString());
+        console.log(data.toString())
         callback(data)
     })
 
