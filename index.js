@@ -7,7 +7,7 @@ const generateVue = require('./src/generate_vue')
 const process = require('process')
 
 program
-  .version('1.0.0')
+  .version('1.0.2')
   
 
 program

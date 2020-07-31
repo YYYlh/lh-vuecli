@@ -1,6 +1,6 @@
 {
   "name": "fantasy-vue-cli",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "👴的脚手架工具",
   "main": "index.js",
   "bin": {
