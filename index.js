@@ -8,7 +8,6 @@ const process = require('process')
 
 program
   .version('1.0.2')
-  
 
 program
   .command('create <projectName>')
